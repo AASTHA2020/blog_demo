@@ -1,24 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import authlogin from "../store/authlogin";
+import useAuthLogin from "../store/authlogin";
 import { CircularProgress } from "@mui/material";
 
 const Login = () => {
-  const {
-    username,
-    password,
-    error,
-    isLoading,
-    setUsername,
-    setPassword,
-    login,
-  } = authlogin();
-
   const navigate = useNavigate();
+
+  const login = useAuthLogin((state) => state.login);
+  const error = useAuthLogin((state) => state.error);
+  const isLoading = useAuthLogin((state) => state.isLoading);
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    login(navigate); 
+    login(username, password, navigate);
   };
 
   return (
@@ -39,6 +36,7 @@ const Login = () => {
               className="w-full px-4 py-2 border border-zinc-300 rounded-lg"
             />
           </div>
+
           <div>
             <label className="block text-gray-700 font-medium mb-1">Password</label>
             <input
@@ -49,6 +47,7 @@ const Login = () => {
               className="w-full px-4 py-2 border border-zinc-300 rounded-lg"
             />
           </div>
+
           <button
             type="submit"
             disabled={isLoading}
