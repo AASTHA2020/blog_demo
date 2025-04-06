@@ -4,11 +4,13 @@ import authlogin from "../store/authlogin";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Profile = () => {
-  const { username, password } = authlogin();
+  const { user } = authlogin();
+  const username = user?.username || "";
+  const password = user?.password || "";
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
     setShowPassword(!showPassword);
   };
 

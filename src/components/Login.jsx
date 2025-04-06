@@ -5,12 +5,11 @@ import { CircularProgress } from "@mui/material";
 
 const Login = () => {
   const navigate = useNavigate();
-
   const login = useAuthLogin((state) => state.login);
   const error = useAuthLogin((state) => state.error);
   const isLoading = useAuthLogin((state) => state.isLoading);
 
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(""); // ✅ Empty input by default
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
@@ -34,6 +33,7 @@ const Login = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full px-4 py-2 border border-zinc-300 rounded-lg"
+              required
             />
           </div>
 
@@ -45,6 +45,7 @@ const Login = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-zinc-300 rounded-lg"
+              required
             />
           </div>
 
