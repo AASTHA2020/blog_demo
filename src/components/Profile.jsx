@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import profile from "../assets/profile.jpg";
 import authlogin from "../store/authlogin";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; //
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Profile = () => {
   const { username, password } = authlogin();
   const [showPassword, setShowPassword] = useState(false);
-  const togglePasswordVisibility = () => {
+
+  const togglePasswordVisibility = (e) => {
+    e.preventDefault(); 
     setShowPassword(!showPassword);
   };
 
@@ -21,60 +23,61 @@ const Profile = () => {
               </h1>
 
               <form>
-                <div className="w-full rounded-sm bg-[url(/assets/profile.jpg)]bg-cover bg-center bg-no-repeat items-center">
+                <div className="w-full items-center">
                   <div>
                     <img
                       src={profile}
-                      alt=""
-                      className="mx-auto flex justify-center w-[141px] h-[141px] bg-blue-300/20 rounded-full bg-[{profile}] bg-cover bg-center bg-no-repeat"
+                      alt="Profile"
+                      className="mx-auto flex justify-center w-[141px] h-[141px] bg-blue-300/20 rounded-full object-cover"
                     />
                   </div>
                 </div>
+
                 <h2 className="text-center mt-3 font-semibold dark:text-gray-300">
                   Upload Profile and Cover Image
                 </h2>
+
                 <div className="flex flex-col lg:flex-row gap-2 justify-center w-full">
-                  <div className="w-full  mb-4 mt-6">
-                    <label for="" className="mb-2 dark:text-gray-300">
+                  <div className="w-full mb-4 mt-6">
+                    <label htmlFor="username" className="mb-2 dark:text-gray-300 block">
                       Username
                     </label>
                     <input
+                      id="username"
                       type="text"
-                      class="mt-2 p-4 w-full border-2 rounded-lg dark:text-gray-200 dark:border-gray-600 dark:bg-gray-800"
-                      placeholder="First Name"
+                      className="mt-2 p-4 w-full border-2 rounded-lg dark:text-gray-200 dark:border-gray-600 dark:bg-gray-800"
+                      placeholder="Username"
                       value={username}
+                      readOnly
                     />
                   </div>
-                  {/* <div className="w-full  mb-4 lg:mt-6">
-                    <label for="" className=" dark:text-gray-300">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      className="mt-2 p-4 w-full border-2 rounded-lg dark:text-gray-200 dark:border-gray-600 dark:bg-gray-800"
-                      placeholder="Last Name"
-                    />
-                  </div> */}
                 </div>
 
-                <div className="flex flex-col lg:flex-row  gap-2 justify-center w-full">
+                <div className="flex flex-col lg:flex-row gap-2 justify-center w-full">
                   <div className="w-full">
-                    <h3 className="dark:text-gray-300 mb-2">Password</h3>
-                    <div className="w-full flex">
-
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      className="w-full text-grey border-2 rounded-lg p-4 pl-2 pr-2 dark:text-gray-200 dark:border-gray-600 dark:bg-gray-800"
-                      value={password}
-                    />
-                    <button onClick={togglePasswordVisibility}>
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </button>
+                    <label htmlFor="password" className="dark:text-gray-300 mb-2 block">
+                      Password
+                    </label>
+                    <div className="w-full flex items-center relative">
+                      <input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        className="w-full text-gray-700 border-2 rounded-lg p-4 pr-10 dark:text-gray-200 dark:border-gray-600 dark:bg-gray-800"
+                        value={password}
+                        readOnly
+                      />
+                      <button
+                        onClick={togglePasswordVisibility}
+                        className="absolute right-3 text-gray-600 dark:text-gray-300"
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
                     </div>
                   </div>
                 </div>
+
                 <div className="w-full rounded-lg bg-blue-500 mt-4 text-white text-lg font-semibold">
-                  <button type="submit" className="w-full p-4 ">
+                  <button type="submit" className="w-full p-4">
                     Submit
                   </button>
                 </div>

@@ -5,7 +5,6 @@ import products from "../data/products";
 function Home() {
   return (
     <div className=" relative w-full h-full mb-11 ">
-       
       <div className="h-96">
         <img src={blog1} alt="" className="w-full h-full object-cover z-auto" />
       </div>
@@ -16,24 +15,18 @@ function Home() {
             Our Products Lists
           </h2>
           <div className="grid w-full grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 justify-items-center gap-6  m-auto">
-            {products.map((products) => (
-              <div class="">
-                <div
-                  key={products.id}
-                  class="relative flex flex-col shadow-md rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 max-w-sm"
-                >
-                
+            {products.map((product) => (
+              <div key={product.id} class="">
+                <div class="relative flex flex-col shadow-md rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 max-w-sm">
                   <div class="h-auto overflow-hidden">
                     <div class="h-44 overflow-hidden relative">
-                      <img src={products.image} alt="" />
+                      <img src={product.image} alt="" />
                     </div>
                   </div>
                   <div class="bg-white py-4 px-3">
-                    <h3 class="text-xs mb-2 font-medium">{products.name}</h3>
+                    <h3 class="text-xs mb-2 font-medium">{product.name}</h3>
                     <div class="flex justify-between items-center">
-                      <p class="text-xs text-gray-400">
-                        {products.description}
-                      </p>
+                      <p class="text-xs text-gray-400">{product.description}</p>
                     </div>
                   </div>
                 </div>
