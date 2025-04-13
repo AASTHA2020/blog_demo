@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useNavigate } from "react-router-dom";
 import authlogin from "../store/authlogin";
+import useCartStore from "../store/cartStore";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 
 export function Search() {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -38,6 +40,18 @@ export function Search() {
             Search
           </button>
         </div>
+        {/* Cart Icon with Notification Bubble */}
+<div className="relative mr-4 mt-1">
+  <ShoppingCartIcon
+    onClick={() => navigate("/cart")}
+    className="text-3xl text-gray-700 cursor-pointer"
+  />
+  <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+    {useCartStore(state => state.getTotalItemCount())}
+  </span>
+</div>
+
+
 
         {/* Profile Dropdown */}
         <div className="flex justify-end sm:block mr-5">

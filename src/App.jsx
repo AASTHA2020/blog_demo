@@ -12,7 +12,7 @@ import NoPage from "./components/Nopage";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import { useState, useEffect } from "react";
-
+import Cart from "./components/Cart";
 import Profile from "./components/Profile";
 
 function App() {
@@ -47,6 +47,9 @@ function App() {
         <Route path="/products" element={<MainLayout><Products /></MainLayout>} />
         <Route path="/*" element={<MainLayout><NoPage /></MainLayout>} />
         <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
+        // in App.jsx or wherever your Routes are set
+<Route path="/cart" element={<Cart />} />
+
 
         </Routes>       
         </div>
@@ -62,6 +65,9 @@ function App() {
         <Route path="/*" element={<MainLayout><NoPage /></MainLayout>} />
         <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
         <Route path = "/login" element= {<Login/>} />
+        // in App.jsx or wherever your Routes are set
+<Route path="/cart" element={<Cart />} />
+
       </Routes>
       </>
       )}
