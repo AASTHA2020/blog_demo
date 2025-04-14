@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useCartStore from "../store/cartStore";
 
 const Cart = () => {
     const cart = useCartStore((state) => state.cart);
     const removeFromCart = useCartStore((state) => state.removeFromCart);
+    const [orderPlaced, setOrderPlaced] = useState(false);
+    const navigate = useNavigate();
 
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     const totalPrice = cart.reduce((sum, item) => sum + item.quantity * (parseFloat(item.price) || 0), 0);
+
+    const handlePlaceOrder = () => {
+        setOrderPlaced(true);
+        setTimeout(() => {
+            navigate("/home");
+        }, 2000); // Navigate after 2 seconds
+    };
 
     return (
         <div className="mt-28 mb-8 px-4">
@@ -39,6 +49,21 @@ const Cart = () => {
                     </div>
                     <div className="text-right font-semibold text-lg">
                         Total Price: ${totalPrice.toFixed(2)}
+                    </div>
+                    <button
+                        onClick={handlePlaceOrder}
+                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full mt-4"
+                    >
+                        Confirm Order
+                    </button>
+                </div>
+            )}
+
+            {orderPlaced && (
+                <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
+                    <div className="text-center">
+                        <h3 className="text-2xl font-bold mb-4 animate-bounce">🎉 Order has been placed!</h3>
+                        <p className="text-gray-500">Redirecting to home...</p>
                     </div>
                 </div>
             )}

@@ -1,14 +1,16 @@
 import { create } from "zustand";
+import useCartStore from "./cartStore";
 
 const useAuthLogin = create((set) => ({
-  user: null, // will store both username and password
+  user: null,
   token: null,
   isLoggedIn: false,
   error: "",
   isLoading: false,
 
+  // Login Logic
   login: async (username, password, navigate) => {
-    set({ isLoading: true, error: "" });
+    set({ isLoading: true });
 
     try {
       const response = await fetch("https://fakestoreapi.com/auth/login", {
@@ -21,11 +23,16 @@ const useAuthLogin = create((set) => ({
 
       if (data.token) {
         set({
+          user: { username, password },
           token: data.token,
-          user: { username, password }, // now storing both username and password
           isLoggedIn: true,
           isLoading: false,
         });
+
+        // ✅ On login, restore the cart (if exists)
+        // useCartStore.getState().restoreCart();
+
+        // Redirect to the home page
         navigate("/home");
       } else {
         set({ error: "Invalid username or password", isLoading: false });
@@ -35,7 +42,9 @@ const useAuthLogin = create((set) => ({
     }
   },
 
+  // Logout Logic
   logout: () => {
+    // useCartStore.getState().clearCart();  // Clear cart on logout
     set({
       user: null,
       token: null,

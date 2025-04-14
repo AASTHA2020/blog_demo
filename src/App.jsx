@@ -14,6 +14,7 @@ import Register from "./components/Register";
 import { useState, useEffect } from "react";
 import Cart from "./components/Cart";
 import Profile from "./components/Profile";
+import ProductDetail from './components/ProductDetail'; // Create this next
 
 function App() {
   const [user, setUser] = useState(null);
@@ -47,7 +48,8 @@ function App() {
         <Route path="/products" element={<MainLayout><Products /></MainLayout>} />
         <Route path="/*" element={<MainLayout><NoPage /></MainLayout>} />
         <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
-        // in App.jsx or wherever your Routes are set
+        <Route path="/product/:id" element={<MainLayout><ProductDetail /></MainLayout>} />
+
 <Route path="/cart" element={<Cart />} />
 
 
