@@ -4,17 +4,39 @@ import useCartStore from "../store/cartStore";
 
 function Products() {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [favorites, setFavorites] = useState({}); // State to track favorite products
   const [selectedProduct, setSelectedProduct] = useState(null); // for detailed view
+  const [priceRange, setPriceRange] = useState([0, 1000]); // Default price range
+  const [sortOrder, setSortOrder] = useState(""); // State for sorting order
   const addToCart = useCartStore((state) => state.addToCart);
 
   useEffect(() => {
     fetch("https://fakestoreapi.com/products")
       .then((response) => response.json())
-      .then((data) => setProducts(data))
+      .then((data) => {
+        setProducts(data);
+        setFilteredProducts(data); // Initialize filtered products
+      })
       .catch((error) => console.error("Error fetching products:", error));
   }, []);
+
+  useEffect(() => {
+    // Filter products based on price range
+    let filtered = products.filter(
+      (product) => product.price >= priceRange[0] && product.price <= priceRange[1]
+    );
+
+    // Sort products based on sortOrder
+    if (sortOrder === "lowToHigh") {
+      filtered = filtered.sort((a, b) => a.price - b.price);
+    } else if (sortOrder === "highToLow") {
+      filtered = filtered.sort((a, b) => b.price - a.price);
+    }
+
+    setFilteredProducts(filtered);
+  }, [priceRange, products, sortOrder]);
 
   const handleAddToCart = (product) => {
     const quantity = quantities[product.id] || 1;
@@ -43,9 +65,53 @@ function Products() {
     }));
   };
 
+  const handlePriceRangeChange = (e, index) => {
+    const newRange = [...priceRange];
+    newRange[index] = Number(e.target.value);
+    setPriceRange(newRange);
+  };
+
+  const handleSortChange = (e) => {
+    setSortOrder(e.target.value);
+  };
+
   return (
     <div className="mt-36 lg:mt-28 mb-6 px-4">
       <h1 className="text-2xl font-bold tracking-wide text-center">PRODUCTS</h1>
+
+      {/* Price Filter */}
+      <div className="flex justify-center items-center mt-4 gap-4">
+        <div>
+          <label className="block text-sm font-medium">Min Price</label>
+          <input
+            type="number"
+            value={priceRange[0]}
+            onChange={(e) => handlePriceRangeChange(e, 0)}
+            className="border rounded px-2 py-1"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Max Price</label>
+          <input
+            type="number"
+            value={priceRange[1]}
+            onChange={(e) => handlePriceRangeChange(e, 1)}
+            className="border rounded px-2 py-1"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium">Sort By</label>
+          <select
+            value={sortOrder}
+            onChange={handleSortChange}
+            className="border rounded px-2 py-1"
+          >
+            <option value="">None</option>
+            <option value="lowToHigh">Price: Low to High</option>
+            <option value="highToLow">Price: High to Low</option>
+          </select>
+        </div>
+      </div>
 
       {/* Full Detailed View */}
       {selectedProduct ? (
@@ -103,7 +169,7 @@ function Products() {
         <div className="bg-gradient-to-bl from-blue-50 to-violet-50 flex items-center justify-center mt-4">
           <div className="container mx-auto p-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <div
                   key={product.id}
                   className="bg-white rounded-lg border p-4 shadow-md relative"
@@ -165,6 +231,7 @@ function Products() {
                       View Details
                     </button>
                   </div>
+               
                 </div>
               ))}
             </div>
