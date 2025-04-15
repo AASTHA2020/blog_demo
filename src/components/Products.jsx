@@ -10,6 +10,9 @@ function Products() {
   const [selectedProduct, setSelectedProduct] = useState(null); // for detailed view
   const [priceRange, setPriceRange] = useState([0, 1000]); // Default price range
   const [sortOrder, setSortOrder] = useState(""); // State for sorting order
+  const [searchTerm, setSearchTerm] = useState(""); // State for search input
+  const [suggestions, setSuggestions] = useState([]); // State for search suggestions
+  const [selectedCategory, setSelectedCategory] = useState(""); // State for category filter
   const addToCart = useCartStore((state) => state.addToCart);
 
   useEffect(() => {
@@ -23,9 +26,13 @@ function Products() {
   }, []);
 
   useEffect(() => {
-    // Filter products based on price range
+    // Filter products based on price range, search term, and category
     let filtered = products.filter(
-      (product) => product.price >= priceRange[0] && product.price <= priceRange[1]
+      (product) =>
+        product.price >= priceRange[0] &&
+        product.price <= priceRange[1] &&
+        product.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (selectedCategory === "" || product.category === selectedCategory)
     );
 
     // Sort products based on sortOrder
@@ -36,7 +43,11 @@ function Products() {
     }
 
     setFilteredProducts(filtered);
-  }, [priceRange, products, sortOrder]);
+  }, [priceRange, products, sortOrder, searchTerm, selectedCategory]);
+
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+  };
 
   const handleAddToCart = (product) => {
     const quantity = quantities[product.id] || 1;
@@ -75,30 +86,66 @@ function Products() {
     setSortOrder(e.target.value);
   };
 
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    // Generate suggestions based on search term
+    if (value) {
+      const filteredSuggestions = products
+        .filter((product) =>
+          product.title.toLowerCase().includes(value.toLowerCase())
+        )
+        .slice(0, 5); // Limit suggestions to 5
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (title) => {
+    setSearchTerm(title);
+    setSuggestions([]); // Close the suggestion box
+  };
+
+  // Debounce search input
+  useEffect(() => {
+    const debounceTimeout = setTimeout(() => {
+      setSearchTerm(searchTerm);
+    }, 300); // 300ms debounce time
+
+    return () => clearTimeout(debounceTimeout);
+  }, [searchTerm]);
+
   return (
     <div className="mt-36 lg:mt-28 mb-6 px-4">
       <h1 className="text-2xl font-bold tracking-wide text-center">PRODUCTS</h1>
 
-      {/* Price Filter */}
-      <div className="flex justify-center items-center mt-4 gap-4">
-        <div>
-          <label className="block text-sm font-medium">Min Price</label>
+      {/* Search and Filter Section */}
+      <div className="flex flex-col md:flex-row justify-center items-center mt-4 gap-4">
+        <div className="relative">
           <input
-            type="number"
-            value={priceRange[0]}
-            onChange={(e) => handlePriceRangeChange(e, 0)}
-            className="border rounded px-2 py-1"
+            type="text"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="Search products..."
+            className="border rounded px-4 py-2 w-64"
           />
+          {suggestions.length > 0 && (
+            <ul className="absolute bg-white border rounded shadow-md mt-1 w-64 max-h-40 overflow-y-auto z-10">
+              {suggestions.map((suggestion) => (
+                <li
+                  key={suggestion.id}
+                  onClick={() => setSearchTerm(suggestion.title)}
+                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                >
+                  {suggestion.title}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        <div>
-          <label className="block text-sm font-medium">Max Price</label>
-          <input
-            type="number"
-            value={priceRange[1]}
-            onChange={(e) => handlePriceRangeChange(e, 1)}
-            className="border rounded px-2 py-1"
-          />
-        </div>
+
         <div>
           <label className="block text-sm font-medium">Sort By</label>
           <select
@@ -109,6 +156,21 @@ function Products() {
             <option value="">None</option>
             <option value="lowToHigh">Price: Low to High</option>
             <option value="highToLow">Price: High to Low</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium">Category</label>
+          <select
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+            className="border rounded px-2 py-1"
+          >
+            <option value="">All</option>
+            <option value="men's clothing">Men</option>
+            <option value="women's clothing">Women</option>
+            <option value="jewelery">Jewelry</option>
+            <option value="electronics">Electronics</option>
           </select>
         </div>
       </div>
@@ -231,7 +293,6 @@ function Products() {
                       View Details
                     </button>
                   </div>
-               
                 </div>
               ))}
             </div>
