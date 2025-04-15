@@ -6,13 +6,15 @@ function Products() {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [quantities, setQuantities] = useState({});
-  const [favorites, setFavorites] = useState({}); // State to track favorite products
-  const [selectedProduct, setSelectedProduct] = useState(null); // for detailed view
-  const [priceRange, setPriceRange] = useState([0, 1000]); // Default price range
-  const [sortOrder, setSortOrder] = useState(""); // State for sorting order
-  const [searchTerm, setSearchTerm] = useState(""); // State for search input
-  const [suggestions, setSuggestions] = useState([]); // State for search suggestions
-  const [selectedCategory, setSelectedCategory] = useState(""); // State for category filter
+  const [favorites, setFavorites] = useState({});
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [sortOrder, setSortOrder] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [currentPage, setCurrentPage] = useState(1); // State for current page
+  const itemsPerPage = 5; // Number of items per page
   const addToCart = useCartStore((state) => state.addToCart);
 
   useEffect(() => {
@@ -20,13 +22,12 @@ function Products() {
       .then((response) => response.json())
       .then((data) => {
         setProducts(data);
-        setFilteredProducts(data); // Initialize filtered products
+        setFilteredProducts(data);
       })
       .catch((error) => console.error("Error fetching products:", error));
   }, []);
 
   useEffect(() => {
-    // Filter products based on price range, search term, and category
     let filtered = products.filter(
       (product) =>
         product.price >= priceRange[0] &&
@@ -35,7 +36,6 @@ function Products() {
         (selectedCategory === "" || product.category === selectedCategory)
     );
 
-    // Sort products based on sortOrder
     if (sortOrder === "lowToHigh") {
       filtered = filtered.sort((a, b) => a.price - b.price);
     } else if (sortOrder === "highToLow") {
@@ -43,6 +43,7 @@ function Products() {
     }
 
     setFilteredProducts(filtered);
+    setCurrentPage(1); // Reset to the first page when filters change
   }, [priceRange, products, sortOrder, searchTerm, selectedCategory]);
 
   const handleCategoryChange = (e) => {
@@ -72,7 +73,7 @@ function Products() {
   const toggleFavorite = (id) => {
     setFavorites((prev) => ({
       ...prev,
-      [id]: !prev[id], // Toggle favorite status
+      [id]: !prev[id],
     }));
   };
 
@@ -90,13 +91,12 @@ function Products() {
     const value = e.target.value;
     setSearchTerm(value);
 
-    // Generate suggestions based on search term
     if (value) {
       const filteredSuggestions = products
         .filter((product) =>
           product.title.toLowerCase().includes(value.toLowerCase())
         )
-        .slice(0, 5); // Limit suggestions to 5
+        .slice(0, 5);
       setSuggestions(filteredSuggestions);
     } else {
       setSuggestions([]);
@@ -105,17 +105,19 @@ function Products() {
 
   const handleSuggestionClick = (title) => {
     setSearchTerm(title);
-    setSuggestions([]); // Close the suggestion box
+    setSuggestions([]);
   };
 
-  // Debounce search input
-  useEffect(() => {
-    const debounceTimeout = setTimeout(() => {
-      setSearchTerm(searchTerm);
-    }, 300); // 300ms debounce time
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
 
-    return () => clearTimeout(debounceTimeout);
-  }, [searchTerm]);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   return (
     <div className="mt-36 lg:mt-28 mb-6 px-4">
@@ -133,15 +135,18 @@ function Products() {
           />
           {suggestions.length > 0 && (
             <ul className="absolute bg-white border rounded shadow-md mt-1 w-64 max-h-40 overflow-y-auto z-10">
-              {suggestions.map((suggestion) => (
-                <li
-                  key={suggestion.id}
-                  onClick={() => setSearchTerm(suggestion.title)}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                >
-                  {suggestion.title}
-                </li>
-              ))}
+               {suggestions.map((suggestion) => (
+    <li
+      key={suggestion.id}
+      onClick={() => {
+        handleSuggestionClick(suggestion.title); // Existing functionality
+        setSuggestions([]); // Close the suggestion box
+      }}
+      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+    >
+      {suggestion.title}
+    </li>
+  ))}
             </ul>
           )}
         </div>
@@ -231,7 +236,7 @@ function Products() {
         <div className="bg-gradient-to-bl from-blue-50 to-violet-50 flex items-center justify-center mt-4">
           <div className="container mx-auto p-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredProducts.map((product) => (
+              {paginatedProducts.map((product) => (
                 <div
                   key={product.id}
                   className="bg-white rounded-lg border p-4 shadow-md relative"
@@ -294,6 +299,23 @@ function Products() {
                     </button>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="flex justify-center mt-6">
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={`px-3 py-1 mx-1 rounded ${
+                    currentPage === index + 1
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                >
+                  {index + 1}
+                </button>
               ))}
             </div>
           </div>
